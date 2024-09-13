@@ -8,9 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@types/js-cookie':
+        specifier: ^3.0.6
+        version: 3.0.6
+      classnames:
+        specifier: ^2.5.1
+        version: 2.5.1
       edgedb:
         specifier: ^1.4.1
         version: 1.5.11
+      js-cookie:
+        specifier: ^3.0.5
+        version: 3.0.5
+      nanoid:
+        specifier: ^5.0.7
+        version: 5.0.7
       next:
         specifier: 14.0.4
         version: 14.0.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -20,6 +32,12 @@ importers:
       react-dom:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
+      replicache:
+        specifier: ^15.0.1
+        version: 15.0.1
+      replicache-react:
+        specifier: ^5.0.1
+        version: 5.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@edgedb/generate':
         specifier: 0.x
@@ -28,7 +46,7 @@ importers:
         specifier: 2.x
         version: 2.1.4
       '@types/node':
-        specifier: ^20
+        specifier: ^20.16.2
         version: 20.16.2
       '@types/react':
         specifier: ^18
@@ -69,6 +87,10 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
+
+  '@badrap/valita@0.3.9':
+    resolution: {integrity: sha512-keFt5iCwI6H5lbvhg2ZJCWa1xRffdpk6/LHCaayubaRM2zhnRIIBE1d+2NEzXLSk4Fe/aklGNXVPt7hNkvBH6g==}
+    engines: {node: '>= 16'}
 
   '@edgedb/generate@0.5.5':
     resolution: {integrity: sha512-tQOT8TmMI3WVUU0ChpCl4rlT1WbmzZVGEohEjn7Uz3f8BhJYEhapkVqV/hlwZcsbFQPClIAFqQnKfXblcB5wqw==}
@@ -206,8 +228,22 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
+  '@rocicorp/lock@1.0.4':
+    resolution: {integrity: sha512-FavTiO8ETXFXDVfA87IThGduTTTR8iqzBnr/c60gUUmbk7knGEXPmf2B+yiNuluJD0ku0fL2V2r62UXnsLXl6w==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
+  '@rocicorp/logger@5.2.2':
+    resolution: {integrity: sha512-lqS/SUUBdiGzsIPD2awMiOzwo0DpAjMriPtqpALausplVHDjyJjUyScrB0Y7QcvxDfSPFkJzT5FncgIU3uBF2g==}
+
+  '@rocicorp/resolver@1.0.2':
+    resolution: {integrity: sha512-TfjMTQp9cNNqNtHFfa+XHEGdA7NnmDRu+ZJH4YF3dso0Xk/b9DMhg/sl+b6CR4ThFZArXXDsG1j8Mwl34wcOZQ==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
   '@swc/helpers@0.5.2':
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
+
+  '@types/js-cookie@3.0.6':
+    resolution: {integrity: sha512-wkw9yd1kEXOPnvEeEV1Go1MmxtBJL0RR79aOTAApecWFVu7w0NNXNqhcWgvw2YgZDYadliXkl14pa3WXw5jlCQ==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -385,6 +421,9 @@ packages:
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
+
+  classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
@@ -664,6 +703,10 @@ packages:
     resolution: {integrity: sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==}
     hasBin: true
 
+  js-cookie@3.0.5:
+    resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
+    engines: {node: '>=14'}
+
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -744,6 +787,11 @@ packages:
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.0.7:
+    resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   natural-compare@1.4.0:
@@ -919,6 +967,17 @@ packages:
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
+
+  replicache-react@5.0.1:
+    resolution: {integrity: sha512-xwiVdoANIX9oagqK8sT/txx9ltfEmkKgbJivdVvyz13bj5PAT+b8o9xuMtY4X1bJgu+9mn04muWPKtPv9MV/ZA==}
+    peerDependencies:
+      react: '>=16.0 <19.0'
+      react-dom: '>=16.0 <19.0'
+
+  replicache@15.0.1:
+    resolution: {integrity: sha512-I7HK6h2eT2QNxO4mwQFDqbuxhvCQgSlU4QuwfN9dqA6EKnO73VYiKB676r36N3q5W7L+htLgAcrSsrX+JPsRlQ==}
+    engines: {node: '>=14.8.0'}
+    hasBin: true
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -1122,6 +1181,8 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
+  '@badrap/valita@0.3.9': {}
+
   '@edgedb/generate@0.5.5(edgedb@1.5.11)':
     dependencies:
       '@iarna/toml': 2.2.5
@@ -1237,9 +1298,19 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
+  '@rocicorp/lock@1.0.4':
+    dependencies:
+      '@rocicorp/resolver': 1.0.2
+
+  '@rocicorp/logger@5.2.2': {}
+
+  '@rocicorp/resolver@1.0.2': {}
+
   '@swc/helpers@0.5.2':
     dependencies:
       tslib: 2.7.0
+
+  '@types/js-cookie@3.0.6': {}
 
   '@types/json-schema@7.0.15': {}
 
@@ -1444,6 +1515,8 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  classnames@2.5.1: {}
 
   client-only@0.0.1: {}
 
@@ -1733,6 +1806,8 @@ snapshots:
 
   jiti@1.21.6: {}
 
+  js-cookie@3.0.5: {}
+
   js-tokens@4.0.0: {}
 
   js-yaml@4.1.0:
@@ -1802,6 +1877,8 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.7: {}
+
+  nanoid@5.0.7: {}
 
   natural-compare@1.4.0: {}
 
@@ -1959,6 +2036,18 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
+
+  replicache-react@5.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  replicache@15.0.1:
+    dependencies:
+      '@badrap/valita': 0.3.9
+      '@rocicorp/lock': 1.0.4
+      '@rocicorp/logger': 5.2.2
+      '@rocicorp/resolver': 1.0.2
 
   resolve-from@4.0.0: {}
 
