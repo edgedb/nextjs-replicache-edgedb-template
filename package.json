@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate": "npx @edgedb/generate interfaces"
+    "generate:interfaces": "pnpm exec generate interfaces",
+    "generate:queries": "pnpm exec generate queries --file",
+    "generate": "pnpm run generate:interfaces && pnpm run generate:queries"
   },
   "dependencies": {
     "@types/js-cookie": "^3.0.6",
