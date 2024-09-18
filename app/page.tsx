@@ -19,7 +19,7 @@ const HomePage = () => {
 
     const replicache = new Replicache({
       name: userID,
-      licenseKey: TEST_LICENSE_KEY, // update with process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY,
+      licenseKey: process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY || TEST_LICENSE_KEY,
       pushURL: '/api/push',
       pullURL: '/api/pull',
       mutators: mutators
