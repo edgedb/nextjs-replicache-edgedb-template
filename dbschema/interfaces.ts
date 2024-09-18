@@ -75,24 +75,27 @@ export namespace cfg {
 }
 export namespace $default {
   export interface ReplicacheClient extends std.$Object {
-    "clientGroupID": string;
-    "clientID": string;
-    "lastModified"?: Date | null;
     "lastMutationID": number;
+    "clientGroup": ReplicacheClientGroup;
+    "clientID": string;
   }
   export interface ReplicacheClientGroup extends std.$Object {
+    "clients": ReplicacheClient[];
     "clientGroupID": string;
+    "todos": Todo[];
   }
   export interface Todo extends std.$Object {
-    "clientGroupID": string;
     "complete": boolean;
     "content": string;
     "todoID": string;
+    "clientGroup": ReplicacheClientGroup;
   }
+  export interface currentGroup extends ReplicacheClientGroup {}
 }
 export type ReplicacheClient = $default.ReplicacheClient;
 export type ReplicacheClientGroup = $default.ReplicacheClientGroup;
 export type Todo = $default.Todo;
+export type currentGroup = $default.currentGroup;
 export namespace fts {
   export type ElasticLanguage = "ara" | "bul" | "cat" | "ces" | "ckb" | "dan" | "deu" | "ell" | "eng" | "eus" | "fas" | "fin" | "fra" | "gle" | "glg" | "hin" | "hun" | "hye" | "ind" | "ita" | "lav" | "nld" | "nor" | "por" | "ron" | "rus" | "spa" | "swe" | "tha" | "tur" | "zho" | "edb_Brazilian" | "edb_ChineseJapaneseKorean";
   export type Language = "ara" | "hye" | "eus" | "cat" | "dan" | "nld" | "eng" | "fin" | "fra" | "deu" | "ell" | "hin" | "hun" | "ind" | "gle" | "ita" | "nor" | "por" | "ron" | "rus" | "spa" | "swe" | "tur";
@@ -357,6 +360,7 @@ export interface types {
     "ReplicacheClient": $default.ReplicacheClient;
     "ReplicacheClientGroup": $default.ReplicacheClientGroup;
     "Todo": $default.Todo;
+    "currentGroup": $default.currentGroup;
   };
   "fts": {
     "ElasticLanguage": fts.ElasticLanguage;

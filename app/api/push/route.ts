@@ -7,8 +7,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { clientGroupID, mutations } = body as PushRequestV1;
 
+  const clientWithGlobals = client.withGlobals({ currentGroupID: clientGroupID });
+
   try {
-    await client.transaction(async tx => {
+    await clientWithGlobals.transaction(async tx => {
       // Ensure the ReplicacheClientGroup exists or create/update it
       let clientGroup = await tx.querySingle<ReplicacheClientGroup>(`
         SELECT ReplicacheClientGroup { clientGroupID }
@@ -25,7 +27,6 @@ export async function POST(request: NextRequest) {
         `, { clientGroupID });
       }
 
-      // Process each mutation
       for (const mutation of mutations) {
         const args = mutation.args as { id: string, todoID: string, content: string, complete: boolean } || {};
 
@@ -34,7 +35,6 @@ export async function POST(request: NextRequest) {
           FILTER .clientID = <str>$clientID
           LIMIT 1
         `, { clientID: mutation.clientID });
-
 
         if (replicacheClient && replicacheClient.clientID !== mutation.clientID) {
           continue; // Skip mutation if client ID doesn't match
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
                 content := <str>$title,
                 complete := <bool>$complete,
                 todoID := <str>$id,
-                clientGroupID := <str>$clientGroupID
+                clientGroup := (SELECT ReplicacheClientGroup FILTER .clientGroupID = <str>$clientGroupID)
               }
             `, {
               title: args.content,
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
             INSERT ReplicacheClient { 
               clientID := <str>$clientID,
               lastMutationID := <int64>$mutation,
-              clientGroupID := <str>$clientGroupID
+              clientGroup := (SELECT ReplicacheClientGroup { clientGroupID } FILTER .clientGroupID = <str>$clientGroupID)
             }
           `, { clientID: mutation.clientID, mutation: mutation.id, clientGroupID });
         } else {
