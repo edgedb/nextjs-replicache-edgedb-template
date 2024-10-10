@@ -1,8 +1,8 @@
-# 🎉 Next.js + Replicache + EdgeDB Todo App Starter
+# 🎉 Next.js + Replicache + EdgeDB Todo App Template
 
 This starter template is crafted to help developers build and deploy applications using Next.js, Replicache, and EdgeDB. It includes essential functionalities for real-time collaboration with offline capabilities and a ready-to-use API setup.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fedgedb%2Fnextjs-replicache-edgedb-starter&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22edgedb%22%2C%22productSlug%22%3A%22edgedb%22%7D%5D)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fedgedb%2Fnextjs-replicache-edgedb-template&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22edgedb%22%2C%22productSlug%22%3A%22edgedb%22%7D%5D)
 
 ## 🚀 Features
 
