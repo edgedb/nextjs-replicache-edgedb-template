@@ -5,15 +5,18 @@ import type {Executor} from "edgedb";
 
 export type GetTodosAndClientsReturns = {
   "todos": Array<{
+    "updated_at": Date | null;
+    "created_at": Date | null;
     "id": string;
+    "version": number | null;
+    "replicache_id": string;
     "complete": boolean;
     "content": string;
-    "todoID": string;
   }>;
   "clients": Array<{
     "id": string;
-    "clientID": string;
-    "lastMutationID": number;
+    "client_id": string;
+    "last_mutation_id": number;
   }>;
 };
 

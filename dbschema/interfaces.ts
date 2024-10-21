@@ -75,27 +75,39 @@ export namespace cfg {
 }
 export namespace $default {
   export interface ReplicacheClient extends std.$Object {
-    "lastMutationID": number;
-    "clientGroup": ReplicacheClientGroup;
-    "clientID": string;
+    "client_group": ReplicacheClientGroup;
+    "client_id": string;
+    "last_mutation_id": number;
   }
   export interface ReplicacheClientGroup extends std.$Object {
+    "client_group_id": string;
+    "cvr_version": number;
+    "entity_versions"?: unknown | null;
+    "last_mutation_ids"?: unknown | null;
     "clients": ReplicacheClient[];
-    "clientGroupID": string;
     "todos": Todo[];
   }
-  export interface Todo extends std.$Object {
+  export interface ReplicacheEntity extends std.$Object {
+    "replicache_id": string;
+    "version"?: number | null;
+  }
+  export interface WithTimestamps extends std.$Object {
+    "created_at"?: Date | null;
+    "updated_at"?: Date | null;
+  }
+  export interface Todo extends WithTimestamps, ReplicacheEntity {
+    "client_group": ReplicacheClientGroup;
     "complete": boolean;
     "content": string;
-    "todoID": string;
-    "clientGroup": ReplicacheClientGroup;
   }
-  export interface currentGroup extends ReplicacheClientGroup {}
+  export interface current_group extends ReplicacheClientGroup {}
 }
 export type ReplicacheClient = $default.ReplicacheClient;
 export type ReplicacheClientGroup = $default.ReplicacheClientGroup;
+export type ReplicacheEntity = $default.ReplicacheEntity;
+export type WithTimestamps = $default.WithTimestamps;
 export type Todo = $default.Todo;
-export type currentGroup = $default.currentGroup;
+export type current_group = $default.current_group;
 export namespace fts {
   export type ElasticLanguage = "ara" | "bul" | "cat" | "ces" | "ckb" | "dan" | "deu" | "ell" | "eng" | "eus" | "fas" | "fin" | "fra" | "gle" | "glg" | "hin" | "hun" | "hye" | "ind" | "ita" | "lav" | "nld" | "nor" | "por" | "ron" | "rus" | "spa" | "swe" | "tha" | "tur" | "zho" | "edb_Brazilian" | "edb_ChineseJapaneseKorean";
   export type Language = "ara" | "hye" | "eus" | "cat" | "dan" | "nld" | "eng" | "fin" | "fra" | "deu" | "ell" | "hin" | "hun" | "ind" | "gle" | "ita" | "nor" | "por" | "ron" | "rus" | "spa" | "swe" | "tur";
@@ -359,8 +371,10 @@ export interface types {
   "default": {
     "ReplicacheClient": $default.ReplicacheClient;
     "ReplicacheClientGroup": $default.ReplicacheClientGroup;
+    "ReplicacheEntity": $default.ReplicacheEntity;
+    "WithTimestamps": $default.WithTimestamps;
     "Todo": $default.Todo;
-    "currentGroup": $default.currentGroup;
+    "current_group": $default.current_group;
   };
   "fts": {
     "ElasticLanguage": fts.ElasticLanguage;
