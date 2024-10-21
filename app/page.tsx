@@ -22,8 +22,8 @@ const HomePage = () => {
       name: userID,
       licenseKey:
         process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY || TEST_LICENSE_KEY,
-      pushURL: '/api/push',
-      pullURL: '/api/pull',
+      pushURL: '/api/row-timestamps/push',
+      pullURL: '/api/row-timestamps/pull',
       mutators: mutators,
       schemaVersion: '1.0',
     })

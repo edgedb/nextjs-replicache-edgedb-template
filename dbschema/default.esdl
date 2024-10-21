@@ -9,16 +9,13 @@ module default {
     required client_group_id: str {
       constraint exclusive;
     };
-
-    required cvr_version: int64 {
-      default := 0;
+    required last_pulled_at: datetime {
+      default := datetime_of_transaction();
     };
-    
-    # { [client_id (str)]: mutation_id (int64) }
-    last_mutation_ids: json;
-    entity_versions: json;
 
     multi clients := .<client_group[is ReplicacheClient];
+    # last_mutation_ids - map of client_id to mutation_id, based on clients
+    # last_mutation_ids := .clients
     multi todos := .<client_group[is Todo];
 
     access policy allow_insert allow insert;
@@ -43,26 +40,37 @@ module default {
   }
 
   abstract type WithTimestamps {
-    created_at: datetime {
+    required created_at: datetime {
       default := datetime_of_transaction();
       readonly := true;
     };
-    updated_at: datetime {
+    required updated_at: datetime {
       rewrite insert, update using (datetime_of_statement());
     };
   }
 
-  abstract type ReplicacheEntity {
-    required replicache_id: str {
-      annotation description := 'The ID of the entity in the Replicache system, generated in the front-end with nanoid.';
-    };
-    version: int32 {
-      default := 0;
-      rewrite update using ( .version + 1);
+  type DeletedEntity {
+    required replicache_id: str;
+    required deleted_at: datetime {
+      default := datetime_of_transaction();
+      readonly := true;
     };
   }
 
-  type Todo extending WithTimestamps, ReplicacheEntity {
+  abstract type ReplicacheEntity extending WithTimestamps {
+    required replicache_id: str {
+      annotation description := 'The ID of the entity in the Replicache system, generated in the front-end with nanoid.';
+    };
+
+    # Allows detecting which entities were deleted, so we can update the Replicache state in the /pull endpoint.
+    trigger register_deletion after delete for each do (
+      insert DeletedEntity {
+        replicache_id := __old__.replicache_id,
+      }
+    );
+  }
+
+  type Todo extending ReplicacheEntity {
     required content: str;
     required complete: bool;
     required client_group: ReplicacheClientGroup;

@@ -1,15 +1,10 @@
-export type Todo = {
-  readonly todoID: string;
-  readonly content: string;
-  readonly complete: boolean;
-  readonly createdAt: number;
-};
+import type { Todo } from '@/dbschema/interfaces'
 
 export const isTodo = (obj: any): obj is Todo => {
-  return 'todoID' in obj && 'content' in obj && 'complete' in obj;
+  return 'replicache_id' in obj && 'content' in obj && 'complete' in obj
 }
 
-export interface Update {
-  readonly todoID: string;
-  readonly complete: boolean;
-};
+export interface TodoUpdate {
+  readonly replicache_id: string
+  readonly complete: boolean
+}
