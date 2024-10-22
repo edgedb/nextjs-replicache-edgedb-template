@@ -12,13 +12,30 @@ This starter template is crafted to help developers build and deploy application
 - [**TypeScript**](https://www.typescriptlang.org/) for static type-checking along with modern JavaScript features.
 - [**Tailwind CSS**](https://tailwindcss.com/) for utility-first CSS styling.
 
-### Data Synchronization and Conflict Resolution
+## Data Synchronization and Conflict Resolution
 
-This project implements Replicache's "reset strategy" for data synchronization and conflict resolution.
+This project implements a timestamp-based syncing solution partially based on Replicache's ["row versioning strategy"](https://doc.replicache.dev/strategies/row-version). This strategy leverages EdgeDB's unique capabilities to create an ergonomic and consistent sync behavior.
 
-For more details on the reset strategy and other synchronization approaches with Replicache, visit the [synchronization strategies overview](https://doc.replicache.dev/strategies/overview) on their documentation site.
+Refer to [documentation on how Replicache works](https://doc.replicache.dev/concepts/how-it-works). Assuming basic understanding of the pull and push endpoints, the high-level overview of how syncing works is as follows:
+
+1. every object type that wishes to be synced extends the `ReplicacheObject` [abstract object type](https://docs.edgedb.com/database/datamodel/objects#abstract-types), with the properties:
+   - `updated_at` timestamps that change automatically on every update via triggers
+   - `replicache_id` referring to the object's key in the Replicache client
+2. when replicache entities are deleted, they create a `DeletedReplicacheObject` row, with `replicache_id` and the `deleted_at` columns
+3. when a `pull` happens (see `/app/replicache/push/process-push.ts`):
+   1. read from the client group's `last_pulled_at` (default to NOW), fetch all rows that `updated_at > last_pulled_at`, and all `deleted_entries` where `deleted_at > last_pulled_at`
+   1. construct `put` patches for the updated rows, and `del` patches for the deleted rows
+   1. the client group's `last_pulled_at` is updated to that of the start of the transaction, as calculated by EdgeDB (database's time as the source of truth)
+4. With these patches, the Replicache client is able to perform the necessary canonical mutations on the front-end
+5. When a `push` happens to modify the state on the server (see `/app/replicache/push/process-push.ts`):
+   1. delete mutations remove the original objects, which automatically create `DeletedReplicacheObject`
+   1. inserts/updates rewrite the `updated_at` property of each object
+   1. the `ReplicacheClient` object is created/updated to reflect the id of the last mutation processed in the request (`last_mutation_id`)
+
+For more details on other synchronization approaches with Replicache, visit the [synchronization strategies overview](https://doc.replicache.dev/strategies/overview) on their documentation site.
 
 ## 🧐 What's Inside?
+
 This project follows a structured approach typical of Next.js applications with additional directories specific to Replicache and EdgeDB:
 
 ```bash
@@ -114,9 +131,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## 🔧 Extend and customize
 
-### Modify the schema
+### Modify the schema and mutations
 
 Adjust the schema in `dbschema/default.esdl` to meet your application's needs. For example, add new types or extend existing ones with additional properties.
+
+In addition to the schema, define client and database mutators for Replicache to work with - refer to `lib/mutators.db|client.ts`
 
 ### Update data fetching
 

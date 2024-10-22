@@ -3,40 +3,53 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "generate:interfaces": "pnpm exec generate interfaces",
-    "generate:queries": "pnpm exec generate queries --file",
-    "generate": "pnpm run generate:interfaces && pnpm run generate:queries"
+    "generate:client": "pnpm exec generate edgeql-js --out dbschema/edgeql --future-polymorphism-as-discriminated-unions --future-strict-type-names",
+    "generate": "pnpm run generate:interfaces && pnpm run generate:client"
   },
   "dependencies": {
     "@types/js-cookie": "^3.0.6",
     "classnames": "^2.5.1",
-    "edgedb": "^1.4.1",
+    "edgedb": "^1.5.12",
     "js-cookie": "^3.0.5",
     "nanoid": "^5.0.7",
-    "next": "14.0.4",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "15.0.0",
+    "react": "19.0.0-rc-65a56d0e-20241020",
+    "react-dom": "19.0.0-rc-65a56d0e-20241020",
     "replicache": "^15.0.1",
-    "replicache-react": "^5.0.1"
+    "replicache-react": "^5.0.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@edgedb/generate": "0.x",
-    "@eslint/eslintrc": "2.x",
-    "@types/node": "^20.16.2",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@typescript-eslint/eslint-plugin": "6.x",
-    "@typescript-eslint/parser": "6.x",
-    "autoprefixer": "^10.0.1",
-    "eslint": "8.x",
-    "eslint-config-prettier": "9.x",
-    "postcss": "^8",
-    "prettier": "3.x",
+    "@edgedb/generate": "0.6.0-canary.20241021T091125",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.13.0",
+    "@next/eslint-plugin-next": "^15.0.0",
+    "@types/node": "^22.7.7",
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
+    "@typescript-eslint/eslint-plugin": "^8.11.0",
+    "@typescript-eslint/parser": "^8.11.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "globals": "^15.11.0",
+    "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "npm:types-react@19.0.0-rc.1",
+      "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
+    }
   }
 }

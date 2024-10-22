@@ -34,4 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-dbschema/edgeql-js
+gitignored
+.env
+
+# Auto-generated via `pnpm run generate`
+dbschema/edgeql
+dbschema/interfaces.ts
