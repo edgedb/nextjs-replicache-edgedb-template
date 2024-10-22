@@ -4,7 +4,7 @@ import { process_pull } from './process-pull'
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  console.log(`Processing pull`, JSON.stringify(body, null, ''))
+  console.log(`Processing pull`, CustomPullRequest.parse(body))
 
   const response = await process_pull(CustomPullRequest.parse(body))
 

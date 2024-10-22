@@ -18,7 +18,8 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
   const todos = useSubscribe(rep, listTodos, { default: [] })
   todos.sort((a, b) => a.created_at.getTime() - b.created_at.getTime())
 
-  const handleNewItem = () => {
+  const handleNewItem = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     if (!newTask) {
       return
     }
@@ -27,19 +28,20 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
       content: newTask,
       complete: false,
     })
+    setNewTask('')
   }
 
   const handleUpdateTodo = (update: TodoUpdate) =>
     rep.mutate.updateTodo({ ...update, complete: !update.complete })
 
-  const handleDeleteTodo = (id: string) => {
-    void rep.mutate.deleteTodo(id)
+  const handleDeleteTodo = (replicache_id: string) => {
+    void rep.mutate.deleteTodo({ replicache_id })
   }
 
   return (
     <div className="mx-auto max-w-md rounded-lg bg-white p-4 shadow-md">
       <h1 className="mb-4 text-2xl font-bold">To-Do List</h1>
-      <div className="mb-4">
+      <form className="mb-4" onSubmit={handleNewItem}>
         <input
           type="text"
           placeholder="Add a new task"
@@ -48,13 +50,13 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
           className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <button
-          onClick={handleNewItem}
+          type="submit"
           className="hover:bg-primary-hover mt-2 rounded-md bg-black px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300"
           disabled={!newTask}
         >
           Add Task
         </button>
-      </div>
+      </form>
       <ul className="space-y-2">
         {todos.map((todo) => (
           <li

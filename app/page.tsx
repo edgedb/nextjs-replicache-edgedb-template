@@ -1,39 +1,11 @@
 'use client'
 
 import { EdgeDB_Vercel } from '@/lib/components/Logo'
-import { M, mutators } from '@/lib/mutators'
-import Cookies from 'js-cookie'
-import { nanoid } from 'nanoid'
-import { useEffect, useState } from 'react'
-import { Replicache, TEST_LICENSE_KEY } from 'replicache'
 import TodoList from '../lib/components/TodoList'
+import useReplicache from './useReplicache'
 
 const HomePage = () => {
-  const [rep, setRep] = useState<Replicache<M> | null>(null)
-
-  useEffect(() => {
-    let userID = Cookies.get('userID')
-    if (!userID) {
-      userID = nanoid()
-      Cookies.set('userID', userID)
-    }
-
-    const replicache = new Replicache({
-      name: userID,
-      licenseKey:
-        process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY || TEST_LICENSE_KEY,
-      pushURL: '/api/row-timestamps/push',
-      pullURL: '/api/row-timestamps/pull',
-      mutators: mutators,
-      schemaVersion: '1.0',
-    })
-
-    setRep(replicache)
-
-    return () => {
-      void replicache.close()
-    }
-  }, [])
+  const rep = useReplicache()
 
   if (!rep) {
     return <div>Loading...</div>

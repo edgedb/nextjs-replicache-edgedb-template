@@ -15,14 +15,20 @@ export const mutators = {
     await tx.set(next.replicache_id, next as unknown as ReadonlyJSONObject)
   },
 
-  deleteTodo: async (tx: WriteTransaction, id: string) => {
-    await tx.del(id)
+  deleteTodo: async (
+    tx: WriteTransaction,
+    { replicache_id }: { replicache_id: string },
+  ) => {
+    await tx.del(replicache_id)
   },
 
   createTodo: async (
     tx: WriteTransaction,
     todo: Pick<Todo, 'complete' | 'content' | 'replicache_id'>,
   ) => {
-    await tx.set(todo.replicache_id, todo)
+    await tx.set(todo.replicache_id, {
+      ...todo,
+      created_at: new Date().toISOString(),
+    })
   },
 }

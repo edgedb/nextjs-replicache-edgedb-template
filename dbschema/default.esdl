@@ -18,18 +18,26 @@ module default {
     # last_mutation_ids := .clients
     multi todos := .<client_group[is Todo];
 
-    access policy allow_insert allow insert;
     
-    access policy allow_select_update allow select, update using (
-      global current_group_id ?= .client_group_id
-    );
+
+    # @TODO: figure out access policy limiting inserting new clients
+    # ERROR: ⨯ CardinalityViolationError: required link 'client_group' of object type 'default::ReplicacheClient' is hidden by access policy
+    
+    # access policy allow_insert allow insert;
+    # access policy allow_select_update allow select, update using (
+    #   global current_group_id ?= .client_group_id
+    # );
+
+    index on ((.client_group_id, .last_pulled_at));
   }
 
   type ReplicacheClient {
     required client_id: str {
       constraint exclusive;
     };
-    required client_group: ReplicacheClientGroup;
+    required client_group: ReplicacheClientGroup {
+      on target delete delete source;
+    };
     required last_mutation_id: int32;
 
     access policy allow_insert allow insert;
@@ -44,7 +52,7 @@ module default {
       default := datetime_of_transaction();
       readonly := true;
     };
-    required updated_at: datetime {
+    updated_at: datetime {
       rewrite insert, update using (datetime_of_statement());
     };
   }
@@ -55,10 +63,14 @@ module default {
       default := datetime_of_transaction();
       readonly := true;
     };
+
+    index on ((.replicache_id, .deleted_at));
   }
 
   abstract type ReplicacheEntity extending WithTimestamps {
     required replicache_id: str {
+      constraint exclusive;
+
       annotation description := 'The ID of the entity in the Replicache system, generated in the front-end with nanoid.';
     };
 
@@ -68,6 +80,8 @@ module default {
         replicache_id := __old__.replicache_id,
       }
     );
+
+    index on ((.replicache_id, .updated_at));
   }
 
   type Todo extending ReplicacheEntity {

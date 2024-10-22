@@ -6,7 +6,7 @@ const cookie = z.object({
 })
 
 export const CustomPullRequest = z.object({
-  cookie: z.union([cookie, z.null()]),
+  cookie: z.union([cookie, z.string(), z.null()]),
   profileID: z.string(),
   clientGroupID: z.string(),
   pullVersion: z.literal(1),

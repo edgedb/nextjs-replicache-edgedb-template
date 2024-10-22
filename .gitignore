@@ -35,6 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 
 dbschema/edgeql-js
-gititgnored
+gitignored
 .env
 dbschema/edgeql

@@ -5,6 +5,7 @@ import {
 import { data_since_last_pull_query } from '@/lib/db.queries'
 import { client } from '@/lib/edgedb'
 import type { CustomPullRequest } from '@/lib/replicache.types'
+import { nanoid } from 'nanoid'
 import type { PatchOperation, PullResponseV1 } from 'replicache'
 import { z } from 'zod'
 
@@ -16,64 +17,81 @@ export async function process_pull({
     current_group_id: client_group_id,
   })
 
-  const { patch, lastMutationIDChanges } = await clientWithGlobals.transaction(
-    async (tx) => {
-      // #1: Get the client group and the data that changed since the last pull
-      const {
-        client_group,
-        entries_deleted_since_last_pull,
-        entries_updated_since_last_pull,
-      } = await data_since_last_pull_query.run(tx, { client_group_id })
+  try {
+    const { patch, lastMutationIDChanges } =
+      await clientWithGlobals.transaction(async (tx) => {
+        // #1: Get the client group and the data that changed since the last pull
+        const {
+          client_group,
+          entries_deleted_since_last_pull,
+          entries_updated_since_last_pull,
+        } = await data_since_last_pull_query.run(tx, { client_group_id })
 
-      // #2 update the group's last pulled at
-      // (if group isn't yet stored, create it)
-      if (client_group.is_stored) {
-        await update_client_group_mutation.run(tx, {
-          client_group_id: client_group.client_group_id,
-          last_pulled_at: client_group.last_pulled_at,
+        console.log('[process-pull] data since last pull:', {
+          client_group,
+          entries_deleted_since_last_pull,
+          entries_updated_since_last_pull,
         })
-      } else {
-        await create_client_group_mutation.run(tx, {
-          client_group_id: client_group.client_group_id,
-          last_pulled_at: client_group.last_pulled_at,
-        })
-      }
 
-      // #3 Construct the patch operations
-      const patch: PatchOperation[] = [
-        ...entries_deleted_since_last_pull.map((entry) => ({
-          op: 'del' as const,
-          key: entry.replicache_id,
-        })),
-        ...entries_updated_since_last_pull.map((entry) => ({
-          op: 'put' as const,
-          key: entry.replicache_id,
-          value: entry,
-        })),
-      ]
+        // #2 update the group's last pulled at
+        // (if group isn't yet stored, create it)
+        if (client_group.in_db) {
+          await update_client_group_mutation.run(tx, {
+            client_group_id: client_group.client_group_id,
+          })
+        } else {
+          await create_client_group_mutation.run(tx, {
+            client_group_id: client_group.client_group_id,
+          })
+        }
 
-      /**
-       * @TODO is lastMutationIDChanges correct? I'm returning every client's  lastMutationID, which doesn't match the docs.
-       * From the docs (https://doc.replicache.dev/reference/server-pull#lastmutationidchanges):
-       * "A map of clients whose lastMutationID have changed since the last pull."
-       *
-       * What's the consequence of this? And what are the alternatives?
-       */
-      const lastMutationIDChanges: Record<string, number> = Object.fromEntries(
-        client_group.clients.map((client) => [
-          client.client_id,
-          client.last_mutation_id,
-        ]),
-      )
+        // #3 Construct the patch operations
+        const patch: PatchOperation[] = [
+          ...entries_deleted_since_last_pull.map((entry) => ({
+            op: 'del' as const,
+            key: entry.replicache_id,
+          })),
+          ...entries_updated_since_last_pull.map((entry) => ({
+            op: 'put' as const,
+            key: entry.replicache_id,
+            value: entry,
+          })),
+        ]
 
-      return { patch, lastMutationIDChanges }
-    },
-  )
+        /**
+         * @TODO is lastMutationIDChanges correct? I'm returning every client's  lastMutationID, which doesn't match the docs.
+         * From the docs (https://doc.replicache.dev/reference/server-pull#lastmutationidchanges):
+         * "A map of clients whose lastMutationID have changed since the last pull."
+         *
+         * What's the consequence of this? And what are the alternatives?
+         */
+        const lastMutationIDChanges: Record<string, number> =
+          Object.fromEntries(
+            client_group.clients.map((client) => [
+              client.client_id,
+              client.last_mutation_id,
+            ]),
+          )
 
-  return {
-    patch,
-    lastMutationIDChanges,
-    // @TODO: what to do about the cookie?
-    cookie: null,
+        // @TODO: what to do about the cookie?
+
+        return {
+          patch,
+          lastMutationIDChanges,
+          // cookie: client_group.last_pulled_at,
+        }
+      })
+
+    console.log('[process-pul] patches:', patch)
+    return {
+      patch,
+      lastMutationIDChanges,
+      cookie: nanoid(),
+    }
+  } catch (error) {
+    console.error('[process-pull] error', error)
+    return {
+      error: 'VersionNotSupported',
+    }
   }
 }

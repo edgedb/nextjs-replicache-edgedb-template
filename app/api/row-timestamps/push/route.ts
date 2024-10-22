@@ -1,12 +1,15 @@
 import { CustomPushRequest } from '@/lib/replicache.types'
-import { NextResponse, type NextRequest } from 'next/server'
+import { type NextRequest } from 'next/server'
 import { process_push } from './process-push'
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  console.log(`Processing push`, JSON.stringify(body, null, ''))
+  console.log(`Processing push`, CustomPushRequest.parse(body))
 
-  const response = await process_push(CustomPushRequest.parse(body))
+  // @TODO error handling
+  await process_push(CustomPushRequest.parse(body))
 
-  return NextResponse.json(response)
+  return new Response(null, {
+    status: 200,
+  })
 }
