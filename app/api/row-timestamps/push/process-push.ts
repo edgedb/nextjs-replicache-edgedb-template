@@ -1,24 +1,18 @@
+import { client as edgedb_client } from '@/lib/edgedb'
 import {
   create_client_group_mutation,
-  create_todo_mutation,
-  delete_todo_mutation,
   modify_clients_mutation,
-  update_todo_mutation,
-} from '@/lib/db.mutations'
-import { fetch_client_group_query } from '@/lib/db.queries'
-import { client as edgedb_client } from '@/lib/edgedb'
-import { Mutation, type CustomPushRequest } from '@/lib/replicache.types'
-import type { MutationV1, PushResponse } from 'replicache'
+} from '@/lib/edgedb.mutations'
+import { fetch_client_group_query } from '@/lib/edgedb.queries'
+import { Mutation } from '@/lib/mutation.types'
+import { MUTATORS_DB } from '@/lib/mutators.db'
+import {
+  type ClientPushInfo,
+  type CustomPushRequest,
+} from '@/lib/replicache.types'
+import type { PushResponse } from 'replicache'
 import { z } from 'zod'
 
-type ClientInfo = {
-  client_id: MutationV1['clientID']
-  last_mutation_id_in_db: MutationV1['id']
-  last_mutation_id_in_request: MutationV1['id']
-}
-
-// @TODO error handling
-// @TODO handle potential conflicts (currently it's last-writer-wins)
 export async function process_push({
   clientGroupID: client_group_id,
   mutations,
@@ -72,82 +66,56 @@ export async function process_push({
       )
       if (!client) continue
 
-      await perform_mutation({
-        rawMutation,
-        client,
+      const parsedMutation = Mutation.safeParse(rawMutation)
+
+      // Even if the mutation is invalid, we treat it as completed
+      // to avoid the client from retrying it indefinitely.
+      // See: https://doc.replicache.dev/reference/server-push#error-handling
+      if (!parsedMutation.success) {
+        console.info('[process-push] skipping mutation already processed', {
+          rawMutation,
+          error: JSON.stringify(parsedMutation.error.issues, null, 2),
+        })
+        return
+      }
+
+      const mutation = parsedMutation.data
+
+      const last_mutation_id = client.last_mutation_id_in_db ?? -1
+
+      // Skip mutation if it has already been processed
+      if (mutation.id <= last_mutation_id) {
+        console.log('[process-push] skipping mutation', {
+          mutationId: mutation.id,
+          last_mutation_id: last_mutation_id,
+        })
+        return
+      }
+
+      const handler = MUTATORS_DB[mutation.name]
+      if (!handler) {
+        console.log(
+          `[process-push] skipping unknown mutation "${mutation.name}". Add a handler for it in MUTATION_HANDLERS if you want to process it.`,
+        )
+        return
+      }
+
+      console.log(
+        `[process-push] performing "${mutation.name}" mutation`,
+        mutation,
+      )
+      await handler({
         tx,
         client_group,
+        client,
+        // @ts-expect-error Too complex to typecheck - zod's already done the runtime work
+        mutation,
       })
     }
   })
 
   return {
     success: true,
-  }
-}
-
-async function perform_mutation({
-  client_group,
-  client,
-  rawMutation,
-  tx,
-}: {
-  client_group: Awaited<ReturnType<typeof fetch_client_group_query.run>>
-  client: ClientInfo
-  rawMutation: z.infer<typeof CustomPushRequest>['mutations'][number]
-  tx: Parameters<Parameters<typeof edgedb_client.transaction>[0]>[0]
-}) {
-  const parsedMutation = Mutation.safeParse(rawMutation)
-
-  // Even if the mutation is invalid, we treat it as completed
-  // to avoid the client from retrying it indefinitely.
-  // See: https://doc.replicache.dev/reference/server-push#error-handling
-  if (!parsedMutation.success) {
-    console.info('[process-push] skipping mutation', {
-      rawMutation,
-      error: JSON.stringify(parsedMutation.error.issues, null, 2),
-    })
-    return
-  }
-
-  const mutation = parsedMutation.data
-
-  const last_mutation_id = client.last_mutation_id_in_db ?? -1
-
-  // Skip mutation if it has already been processed
-  if (mutation.id <= last_mutation_id) {
-    console.log('[process-push] skipping mutation', {
-      mutationId: mutation.id,
-      last_mutation_id: last_mutation_id,
-    })
-    return
-  }
-
-  switch (mutation.name) {
-    case 'createTodo':
-      console.log('[process-push] createTodo', mutation)
-      await create_todo_mutation.run(tx, {
-        client_group_id: client_group.client_group_id,
-        complete: mutation.args.complete,
-        content: mutation.args.content,
-        replicache_id: mutation.args.replicache_id,
-      })
-      break
-    case 'deleteTodo':
-      console.log('[process-push] deleteTodo', mutation)
-      await delete_todo_mutation.run(tx, {
-        replicache_id: mutation.args.replicache_id,
-      })
-      break
-    case 'updateTodo':
-      console.log('[process-push] updateTodo', mutation)
-      await update_todo_mutation.run(tx, {
-        complete: mutation.args.complete,
-        replicache_id: mutation.args.replicache_id,
-      })
-      break
-    default:
-      break
   }
 }
 
@@ -159,8 +127,8 @@ function parse_clients({
   client_group: Awaited<ReturnType<typeof fetch_client_group_query.run>>
 }) {
   const clients_with_ids = {
-    new: [] as ClientInfo[],
-    in_db: [] as ClientInfo[],
+    new: [] as ClientPushInfo[],
+    in_db: [] as ClientPushInfo[],
   }
 
   for (const mutation of mutations) {

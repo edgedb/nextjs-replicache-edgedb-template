@@ -35,8 +35,8 @@ const HomePage = () => {
           </h1>
           <p className="mt-4 text-base leading-7 text-gray-600">
             This is a starter template for building realtime, offline-first
-            applications. It's a minimal todo app that demonstrates how to set
-            up{' '}
+            applications. It&apos;s a minimal todo app that demonstrates how to
+            set up{' '}
             <a
               href="https://replicache.dev/"
               target="_blank"

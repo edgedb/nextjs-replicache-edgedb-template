@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   console.log(`Processing pull`, CustomPullRequest.parse(body))
 
+  // @TODO error handling
   const response = await process_pull(CustomPullRequest.parse(body))
 
   return NextResponse.json(response, {

@@ -1,14 +1,13 @@
+import { client } from '@/lib/edgedb'
 import {
   create_client_group_mutation,
   update_client_group_mutation,
-} from '@/lib/db.mutations'
-import { data_since_last_pull_query } from '@/lib/db.queries'
-import { client } from '@/lib/edgedb'
+} from '@/lib/edgedb.mutations'
+import { data_since_last_pull_query } from '@/lib/edgedb.queries'
 import type { CustomPullRequest } from '@/lib/replicache.types'
 import type { PatchOperation, PullResponseV1 } from 'replicache'
 import { z } from 'zod'
 
-// @TODO error handling
 export async function process_pull({
   clientGroupID: client_group_id,
 }: z.infer<typeof CustomPullRequest>): Promise<PullResponseV1> {

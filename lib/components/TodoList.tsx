@@ -3,8 +3,7 @@ import React, { useState } from 'react'
 import { ReadTransaction, Replicache } from 'replicache'
 import { useSubscribe } from 'replicache-react'
 import { generate_replicache_id, REPLICACHE_ID_PREFIXES } from '../ids'
-import { M } from '../mutators'
-import { TodoUpdate } from '../types'
+import { M } from '../mutators.client'
 import { DeleteIcon } from './DeleteIcon'
 
 export async function listTodos(tx: ReadTransaction) {
@@ -17,7 +16,7 @@ export async function listTodos(tx: ReadTransaction) {
 const TodoList = ({ rep }: { rep: Replicache<M> }) => {
   const [newTask, setNewTask] = useState('')
 
-  // Subscribe to all todos and sort them.
+  // Subscribe to all todos and sort them from newest to oldest
   const todos = useSubscribe(rep, listTodos, { default: [] })
   todos.sort(
     (a, b) =>
@@ -34,12 +33,10 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
       content: newTask,
       complete: false,
       replicache_id: generate_replicache_id(REPLICACHE_ID_PREFIXES.todo),
+      created_at: new Date(),
     })
     setNewTask('')
   }
-
-  const handleUpdateTodo = (update: TodoUpdate) =>
-    rep.mutate.updateTodo({ ...update, complete: !update.complete })
 
   const handleDeleteTodo = (replicache_id: string) => {
     void rep.mutate.deleteTodo({ replicache_id })
@@ -74,14 +71,25 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
               <input
                 type="checkbox"
                 checked={todo.complete}
-                onChange={() => handleUpdateTodo(todo)}
+                onChange={() =>
+                  rep.mutate.updateTodo({
+                    replicache_id: todo.replicache_id,
+                    complete: !todo.complete,
+                  })
+                }
                 className="mr-2 rounded-sm focus:ring-2 focus:ring-primary"
               />
-              <span
-                className={`text-gray-800 ${todo.complete ? 'text-gray-400 line-through' : ''}`}
-              >
-                {todo.content}
-              </span>
+              <input
+                type="text"
+                value={todo.content || ''}
+                className={`bg-transparent text-gray-800 ${todo.complete ? 'text-gray-400 line-through' : ''}`}
+                onChange={(e) =>
+                  rep.mutate.updateTodo({
+                    replicache_id: todo.replicache_id,
+                    content: e.target.value,
+                  })
+                }
+              />
             </div>
             <button
               onClick={() => handleDeleteTodo(todo.replicache_id)}

@@ -51,12 +51,14 @@ export const create_todo_mutation = e.params(
     content: e.str,
     replicache_id: e.str,
     client_group_id: e.str,
+    created_at: e.datetime,
   },
   (params) => {
     return e.insert(e.Todo, {
       complete: params.complete,
       content: params.content,
       replicache_id: params.replicache_id,
+      created_at: params.created_at,
       client_group: e.select(e.ReplicacheClientGroup, (rg) => ({
         filter_single: e.op(rg.client_group_id, '=', params.client_group_id),
       })),
@@ -77,14 +79,16 @@ export const delete_todo_mutation = e.params(
 
 export const update_todo_mutation = e.params(
   {
-    complete: e.bool,
     replicache_id: e.str,
+    complete: e.optional(e.bool),
+    content: e.optional(e.str),
   },
   (params) => {
     return e.update(e.Todo, (t) => ({
       filter_single: e.op(t.replicache_id, '=', params.replicache_id),
       set: {
-        complete: params.complete,
+        complete: e.op(params.complete, '??', t.complete),
+        content: e.op(params.content, '??', t.content),
       },
     }))
   },

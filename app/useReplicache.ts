@@ -1,6 +1,6 @@
 'use client'
 
-import { M, mutators } from '@/lib/mutators'
+import { M, MUTATORS_CLIENT } from '@/lib/mutators.client'
 import Cookies from 'js-cookie'
 import { nanoid } from 'nanoid'
 import { useEffect, useState } from 'react'
@@ -22,7 +22,7 @@ export default function useReplicache() {
         process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY || TEST_LICENSE_KEY,
       pushURL: '/api/row-timestamps/push',
       pullURL: '/api/row-timestamps/pull',
-      mutators: mutators,
+      mutators: MUTATORS_CLIENT,
       schemaVersion: '1.0',
       requestOptions: {
         minDelayMs: 5000, // long time during dev to allow for easier debugging

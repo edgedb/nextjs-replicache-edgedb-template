@@ -1,7 +1,14 @@
+import type { MutationV1 } from 'replicache'
 import { z } from 'zod'
 
+export type ClientPushInfo = {
+  client_id: MutationV1['clientID']
+  last_mutation_id_in_db: MutationV1['id']
+  last_mutation_id_in_request: MutationV1['id']
+}
+
 export const CustomPullRequest = z.object({
-  cookie: z.number(),
+  cookie: z.union([z.number(), z.null()]),
   profileID: z.string(),
   clientGroupID: z.string(),
   pullVersion: z.literal(1),
@@ -12,7 +19,7 @@ export type ReplicacheClientGroup = {
   client_group_id: string
 }
 
-const BaseReplicacheMutation = z.object({
+export const BaseReplicacheMutation = z.object({
   clientID: z.string(),
   timestamp: z.number(),
   id: z.number(),
@@ -28,36 +35,6 @@ export const CustomPushRequest = z.object({
    */
   mutations: z.array(BaseReplicacheMutation.passthrough()),
 })
-
-const CreateTodoMutation = BaseReplicacheMutation.extend({
-  name: z.literal('createTodo'),
-  args: z.object({
-    complete: z.boolean(),
-    content: z.string(),
-    replicache_id: z.string(),
-  }),
-})
-
-const UpdateTodoMutation = BaseReplicacheMutation.extend({
-  name: z.literal('updateTodo'),
-  args: z.object({
-    complete: z.boolean(),
-    replicache_id: z.string(),
-  }),
-})
-
-const DeleteTodoMutation = BaseReplicacheMutation.extend({
-  name: z.literal('deleteTodo'),
-  args: z.object({
-    replicache_id: z.string(),
-  }),
-})
-
-export const Mutation = z.union([
-  CreateTodoMutation,
-  UpdateTodoMutation,
-  DeleteTodoMutation,
-])
 
 /**
  * Processes the `X-Replicache-RequestID` header to extract the clientID, sessionID, and request count.
