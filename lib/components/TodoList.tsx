@@ -1,14 +1,17 @@
-import { nanoid } from 'nanoid'
+import type { Todo } from '@/dbschema/interfaces'
 import React, { useState } from 'react'
 import { ReadTransaction, Replicache } from 'replicache'
 import { useSubscribe } from 'replicache-react'
+import { REPLICACHE_ID_PREFIXES } from '../ids'
 import { M } from '../mutators'
 import { TodoUpdate } from '../types'
 import { DeleteIcon } from './DeleteIcon'
-import type { Todo } from '@/dbschema/interfaces'
 
 export async function listTodos(tx: ReadTransaction) {
-  return (await tx.scan().values().toArray()) as unknown as Todo[]
+  return (await tx
+    .scan({ prefix: REPLICACHE_ID_PREFIXES.todo })
+    .values()
+    .toArray()) as unknown as Todo[]
 }
 
 const TodoList = ({ rep }: { rep: Replicache<M> }) => {
@@ -16,7 +19,10 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
 
   // Subscribe to all todos and sort them.
   const todos = useSubscribe(rep, listTodos, { default: [] })
-  todos.sort((a, b) => a.created_at.getTime() - b.created_at.getTime())
+  todos.sort(
+    (a, b) =>
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+  )
 
   const handleNewItem = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -24,7 +30,6 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
       return
     }
     rep.mutate.createTodo({
-      replicache_id: nanoid(),
       content: newTask,
       complete: false,
     })

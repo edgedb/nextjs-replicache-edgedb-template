@@ -1,6 +1,7 @@
-import { WriteTransaction, type ReadonlyJSONObject } from 'replicache'
-import { TodoUpdate } from './types'
 import type { Todo } from '@/dbschema/interfaces'
+import { WriteTransaction, type ReadonlyJSONObject } from 'replicache'
+import { generate_replicache_id, REPLICACHE_ID_PREFIXES } from './ids'
+import { TodoUpdate } from './types'
 
 export type M = typeof mutators
 
@@ -24,10 +25,12 @@ export const mutators = {
 
   createTodo: async (
     tx: WriteTransaction,
-    todo: Pick<Todo, 'complete' | 'content' | 'replicache_id'>,
+    todo: Pick<Todo, 'complete' | 'content'>,
   ) => {
-    await tx.set(todo.replicache_id, {
+    const replicache_id = generate_replicache_id(REPLICACHE_ID_PREFIXES.todo)
+    await tx.set(replicache_id, {
       ...todo,
+      replicache_id: replicache_id,
       created_at: new Date().toISOString(),
     })
   },
