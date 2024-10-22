@@ -58,14 +58,17 @@ export const data_since_last_pull_query = e.params(
   (params) => {
     const client_group = select_client_group(params.client_group_id)
 
-    const entries_deleted_since_last_pull = e.select(e.DeletedEntity, (de) => ({
-      filter: e.op(de.deleted_at, '>', client_group.last_pulled_at),
+    const entries_deleted_since_last_pull = e.select(
+      e.DeletedReplicacheObject,
+      (de) => ({
+        filter: e.op(de.deleted_at, '>', client_group.last_pulled_at),
 
-      replicache_id: true,
-    }))
+        replicache_id: true,
+      }),
+    )
 
     const entries_updated_since_last_pull = e.select(
-      e.ReplicacheEntity,
+      e.ReplicacheObject,
       (t) => ({
         filter: e.op(t.updated_at, '>', client_group.last_pulled_at),
 

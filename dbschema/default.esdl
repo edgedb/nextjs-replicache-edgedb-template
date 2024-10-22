@@ -57,7 +57,8 @@ module default {
     };
   }
 
-  type DeletedEntity {
+  # Tombstone to sync deleted objects to Replicache in the `/pull` endpoint.
+  type DeletedReplicacheObject {
     required replicache_id: str;
     required deleted_at: datetime {
       default := datetime_of_transaction();
@@ -67,16 +68,16 @@ module default {
     index on ((.replicache_id, .deleted_at));
   }
 
-  abstract type ReplicacheEntity extending WithTimestamps {
+  abstract type ReplicacheObject extending WithTimestamps {
     required replicache_id: str {
       constraint exclusive;
 
-      annotation description := 'The ID of the entity in the Replicache system, generated in the front-end with nanoid.';
+      annotation description := 'The key/id of the object in the Replicache client, generated in the front-end with nanoid via the `generate_replicache_id` function.';
     };
 
     # Allows detecting which entities were deleted, so we can update the Replicache state in the /pull endpoint.
     trigger register_deletion after delete for each do (
-      insert DeletedEntity {
+      insert DeletedReplicacheObject {
         replicache_id := __old__.replicache_id,
       }
     );
@@ -84,7 +85,7 @@ module default {
     index on ((.replicache_id, .updated_at));
   }
 
-  type Todo extending ReplicacheEntity {
+  type Todo extending ReplicacheObject {
     required content: str;
     required complete: bool;
     required client_group: ReplicacheClientGroup;
