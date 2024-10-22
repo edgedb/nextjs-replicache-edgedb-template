@@ -8,9 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate:interfaces": "pnpm exec generate interfaces",
-    "generate:queries": "pnpm exec generate queries --file",
     "generate:client": "pnpm exec generate edgeql-js --out dbschema/edgeql --future-polymorphism-as-discriminated-unions --future-strict-type-names",
-    "generate": "pnpm run generate:interfaces && pnpm run generate:queries && pnpm run generate:client"
+    "generate": "pnpm run generate:interfaces && pnpm run generate:client"
   },
   "dependencies": {
     "@types/js-cookie": "^3.0.6",

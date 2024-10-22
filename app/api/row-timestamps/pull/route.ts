@@ -8,5 +8,7 @@ export async function POST(request: NextRequest) {
 
   const response = await process_pull(CustomPullRequest.parse(body))
 
-  return NextResponse.json(response)
+  return NextResponse.json(response, {
+    status: 200,
+  })
 }

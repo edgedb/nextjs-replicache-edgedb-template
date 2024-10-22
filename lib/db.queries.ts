@@ -85,6 +85,7 @@ export const data_since_last_pull_query = e.params(
       client_group,
       entries_deleted_since_last_pull,
       entries_updated_since_last_pull,
+      transaction_start_time: e.datetime_of_transaction(),
     })
   },
 )

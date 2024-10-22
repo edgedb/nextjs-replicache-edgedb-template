@@ -102,7 +102,13 @@ async function perform_mutation({
   // Even if the mutation is invalid, we treat it as completed
   // to avoid the client from retrying it indefinitely.
   // See: https://doc.replicache.dev/reference/server-push#error-handling
-  if (!parsedMutation.success) return
+  if (!parsedMutation.success) {
+    console.info('[process-push] skipping mutation', {
+      rawMutation,
+      error: JSON.stringify(parsedMutation.error.issues, null, 2),
+    })
+    return
+  }
 
   const mutation = parsedMutation.data
 

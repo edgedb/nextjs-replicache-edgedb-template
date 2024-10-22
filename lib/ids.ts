@@ -8,5 +8,5 @@ type EdgedbObjectType =
   (typeof REPLICACHE_ID_PREFIXES)[keyof typeof REPLICACHE_ID_PREFIXES]
 
 export function generate_replicache_id(type: EdgedbObjectType) {
-  return `${type}::${nanoid()}`
+  return `${type}/${nanoid()}`
 }

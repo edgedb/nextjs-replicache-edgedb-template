@@ -21,12 +21,13 @@ export default function useReplicache() {
       licenseKey:
         process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY || TEST_LICENSE_KEY,
       pushURL: '/api/row-timestamps/push',
-      // pullURL: '/api/row-timestamps/pull',
+      pullURL: '/api/row-timestamps/pull',
       mutators: mutators,
       schemaVersion: '1.0',
       requestOptions: {
-        minDelayMs: 5000, // give me time to process!
+        minDelayMs: 5000, // long time during dev to allow for easier debugging
       },
+      logLevel: 'debug',
     })
 
     setRep(replicache)

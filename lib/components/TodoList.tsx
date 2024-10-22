@@ -2,7 +2,7 @@ import type { Todo } from '@/dbschema/interfaces'
 import React, { useState } from 'react'
 import { ReadTransaction, Replicache } from 'replicache'
 import { useSubscribe } from 'replicache-react'
-import { REPLICACHE_ID_PREFIXES } from '../ids'
+import { generate_replicache_id, REPLICACHE_ID_PREFIXES } from '../ids'
 import { M } from '../mutators'
 import { TodoUpdate } from '../types'
 import { DeleteIcon } from './DeleteIcon'
@@ -21,7 +21,7 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
   const todos = useSubscribe(rep, listTodos, { default: [] })
   todos.sort(
     (a, b) =>
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   )
 
   const handleNewItem = (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,9 +29,11 @@ const TodoList = ({ rep }: { rep: Replicache<M> }) => {
     if (!newTask) {
       return
     }
+
     rep.mutate.createTodo({
       content: newTask,
       complete: false,
+      replicache_id: generate_replicache_id(REPLICACHE_ID_PREFIXES.todo),
     })
     setNewTask('')
   }

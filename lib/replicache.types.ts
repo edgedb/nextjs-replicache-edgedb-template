@@ -1,12 +1,7 @@
 import { z } from 'zod'
 
-const cookie = z.object({
-  order: z.number(),
-  cvr_id: z.string(),
-})
-
 export const CustomPullRequest = z.object({
-  cookie: z.union([cookie, z.string(), z.null()]),
+  cookie: z.number(),
   profileID: z.string(),
   clientGroupID: z.string(),
   pullVersion: z.literal(1),
